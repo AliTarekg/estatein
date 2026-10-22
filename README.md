@@ -3,6 +3,8 @@
 A custom classic WordPress theme built from the Figma community file **Real Estate Business Website UI Template – Dark Theme** (Produce UI). It covers all six designed pages — Home, About Us, Properties, Property Details, Services and Contact — at desktop, laptop, tablet and mobile widths. Content is editable through custom post types, ACF fields and the Customizer, and forms work without plugins.
 
 - **Live demo:** https://rebw.ifree.page/ (InfinityFree free hosting; first load can be slow)
+- **Repository:** https://github.com/AliTarekg/estatein
+- **Development notes:** [DOCUMENTATION.md](DOCUMENTATION.md) — process, architecture decisions, plugins and tools
 - **Requires:** WordPress 6.4+ · PHP 7.4+. Tested on WordPress 7.1.3 / PHP 8.5 (WordPress Playground).
 - **Recommended plugin:** [Advanced Custom Fields](https://wordpress.org/plugins/advanced-custom-fields/) (free). The theme renders fully without it, using the design's copy as defaults; ACF only adds the editing screens.
 
