@@ -84,6 +84,8 @@
 			var prev = carousel.querySelector( '[data-carousel-prev]' );
 			var next = carousel.querySelector( '[data-carousel-next]' );
 			var current = carousel.querySelector( '[data-carousel-current]' );
+			var dots = carousel.querySelectorAll( '[data-carousel-dot]' );
+			var thumbs = carousel.querySelectorAll( '[data-carousel-goto]' );
 			var slides = track ? track.children : [];
 			if ( ! track || ! slides.length ) {
 				return;
@@ -115,6 +117,15 @@
 				if ( next ) {
 					next.disabled = atEnd;
 				}
+
+				// Gallery: highlight the dot and thumbnail of the first visible photo.
+				var active = atEnd ? slides.length - 1 : index;
+				dots.forEach( function ( dot, i ) {
+					dot.classList.toggle( 'is-active', i === active );
+				} );
+				thumbs.forEach( function ( thumb, i ) {
+					thumb.setAttribute( 'aria-current', String( i === Math.min( index, slides.length - 1 ) ) );
+				} );
 			}
 
 			function go( direction ) {
@@ -123,6 +134,15 @@
 					behavior: reduceMotion ? 'auto' : 'smooth',
 				} );
 			}
+
+			thumbs.forEach( function ( thumb ) {
+				thumb.addEventListener( 'click', function () {
+					track.scrollTo( {
+						left: Number( thumb.getAttribute( 'data-carousel-goto' ) ) * slideStep(),
+						behavior: reduceMotion ? 'auto' : 'smooth',
+					} );
+				} );
+			} );
 
 			if ( prev ) {
 				prev.addEventListener( 'click', function () {
@@ -179,6 +199,32 @@
 				button.setAttribute( 'aria-expanded', String( open ) );
 				button.textContent = open ? i18n.readLess : i18n.readMore;
 				answer.hidden = ! open;
+			} );
+		} );
+	}
+
+	/**
+	 * Category tabs that filter a list by data-category (office locations).
+	 * Without JavaScript every item stays visible.
+	 */
+	function initFilterTabs() {
+		document.querySelectorAll( '[data-filter-tabs]' ).forEach( function ( group ) {
+			var list = document.getElementById( group.getAttribute( 'data-filter-tabs' ) );
+			var tabs = group.querySelectorAll( '[data-filter]' );
+			if ( ! list ) {
+				return;
+			}
+
+			tabs.forEach( function ( tab ) {
+				tab.addEventListener( 'click', function () {
+					var filter = tab.getAttribute( 'data-filter' );
+					tabs.forEach( function ( other ) {
+						other.setAttribute( 'aria-pressed', String( other === tab ) );
+					} );
+					Array.prototype.forEach.call( list.children, function ( item ) {
+						item.hidden = filter !== 'all' && item.getAttribute( 'data-category' ) !== filter;
+					} );
+				} );
 			} );
 		} );
 	}
@@ -252,26 +298,21 @@
 	}
 
 	/**
-	 * Submit the property-type filter as soon as it changes.
-	 */
-	function initAutoSubmit() {
-		document.querySelectorAll( '[data-autosubmit]' ).forEach( function ( select ) {
-			select.addEventListener( 'change', function () {
-				select.form.submit();
-			} );
-		} );
-	}
-
-	/**
 	 * Accessible inline validation for forms marked data-validate.
 	 * The server validates again; this only gives faster feedback.
 	 */
 	function initValidation() {
 		document.querySelectorAll( 'form[data-validate]' ).forEach( function ( form ) {
-			function check( field ) {
+			// "addOnly" (used on blur) never removes a message: removing it there
+			// shifts the layout under the pointer and the next click would miss.
+			function check( field, addOnly ) {
 				var errorId = field.id + '-error';
 				var error = document.getElementById( errorId );
 				var valid = field.checkValidity();
+
+				if ( valid && addOnly ) {
+					return true;
+				}
 
 				field.setAttribute( 'aria-invalid', String( ! valid ) );
 
@@ -280,7 +321,15 @@
 						error = document.createElement( 'p' );
 						error.className = 'field__error';
 						error.id = errorId;
-						( field.closest( '.field' ) || field.parentNode ).appendChild( error );
+						var label = field.closest( 'label' );
+						var wrap = field.closest( '.field' );
+						if ( wrap ) {
+							wrap.appendChild( error );
+						} else if ( label ) {
+							label.insertAdjacentElement( 'afterend', error );
+						} else {
+							field.insertAdjacentElement( 'afterend', error );
+						}
 						field.setAttribute( 'aria-describedby', errorId );
 					}
 					error.textContent = field.validationMessage;
@@ -296,7 +345,18 @@
 					field.id = 'field-' + Math.random().toString( 36 ).slice( 2 );
 				}
 				field.addEventListener( 'blur', function () {
-					check( field );
+					// Only flag text fields the visitor has typed in; the submit check covers the rest.
+					if ( field.type !== 'checkbox' && field.value !== '' ) {
+						check( field, true );
+					}
+				} );
+				// Clear the message as soon as the field becomes valid.
+				[ 'input', 'change' ].forEach( function ( type ) {
+					field.addEventListener( type, function () {
+						if ( field.getAttribute( 'aria-invalid' ) === 'true' ) {
+							check( field );
+						}
+					} );
 				} );
 			} );
 
@@ -325,8 +385,8 @@
 	initNav();
 	initCarousels();
 	initFaqs();
+	initFilterTabs();
 	initReveal();
 	initCountUp();
-	initAutoSubmit();
 	initValidation();
 }() );
