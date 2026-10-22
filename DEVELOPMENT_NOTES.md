@@ -44,7 +44,7 @@ Editors use familiar screens. Pages have tabbed ACF sections. Properties have a 
 
 ## 7. Limitations and next steps
 
-- Not yet deployed to a public host; the release zip and steps are ready (README, "Deploying").
+- Live on free hosting (InfinityFree): https://rebw.ifree.page/ — first loads can be slow on the free tier.
 - Properties are a filtered, paginated grid instead of the Figma carousel, which suits search better.
 - Clients, offices and social links are sample content; replace them before launch.
 - In production the post types would move to a small site plugin, so content survives a theme switch.

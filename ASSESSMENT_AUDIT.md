@@ -103,7 +103,7 @@ Environment: WordPress 7.1.3, PHP 8.5.10 (WordPress Playground CLI), ACF 6 (free
 | 10 | Logo and line artwork | PASS | Figma SVGs used. |
 | 11 | Stat label wrapping | PASS | One line at 1440 (screenshot). |
 | 12 | Documentation honesty | PASS | README / DEVELOPMENT_NOTES rewritten to state only what was verified. |
-| 13 | Live deployment / GitHub | BLOCKED | No hosting credentials; `gh` not authenticated, no remote. Release zip and steps ready. |
+| 13 | Live deployment / GitHub | PARTIAL | Live at https://rebw.ifree.page/ (InfinityFree): all pages 200 at 1440 and 390px, 0 overflow, no JS errors, 32/32 links and anchors OK. GitHub push still pending (`gh` not authenticated). |
 | 14 | `.gitignore` / `.gitattributes` | PASS | Added; repository history starts from a baseline commit. |
 
 ### Verification performed
@@ -133,7 +133,7 @@ Environment: WordPress 7.1.3, PHP 8.5.10 (WordPress Playground CLI), ACF 6 (free
 
 ### Remaining
 
-- **BLOCKED:** public deployment and GitHub push (needs the candidate's accounts).
+- **Deployed:** https://rebw.ifree.page/ (verified in Chromium). **BLOCKED:** GitHub push (needs the candidate's account).
 - **PARTIAL:** Real-device Safari/Firefox testing not done; only Chromium was available. PHP 7.4 compatibility is by code review only; tested on PHP 8.5.
 - **Deliberate deviation:** Properties archive is a paginated grid instead of a carousel, so filtering stays usable.
 - **Content to replace before launch:** social links (`#`), sample clients and offices.
