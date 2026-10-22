@@ -48,6 +48,23 @@ function estatein_setup() {
 add_action( 'after_setup_theme', 'estatein_setup' );
 
 /**
+ * Favicon from the logo symbol, used until a Site Icon is set in
+ * Appearance > Customize > Site Identity (which then takes over).
+ */
+function estatein_favicon() {
+	if ( has_site_icon() ) {
+		return;
+	}
+
+	$base = ESTATEIN_URI . '/assets/images/';
+	printf( '<link rel="icon" href="%s" type="image/svg+xml">' . "\n", esc_url( $base . 'favicon.svg' ) );
+	printf( '<link rel="icon" href="%s" type="image/png" sizes="32x32">' . "\n", esc_url( $base . 'favicon-32.png' ) );
+	printf( '<link rel="apple-touch-icon" href="%s">' . "\n", esc_url( $base . 'apple-touch-icon.png' ) );
+}
+add_action( 'wp_head', 'estatein_favicon', 2 );
+add_action( 'admin_head', 'estatein_favicon' );
+
+/**
  * Default nav menu fallback, so the header matches the design before a menu
  * is assigned in Appearance > Menus.
  */

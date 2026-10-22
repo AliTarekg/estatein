@@ -37,7 +37,8 @@ function estatein_seed_demo_content() {
 	if ( in_array( get_option( 'blogname' ), array( '', 'My WordPress Website', 'My Blog', 'WordPress' ), true ) ) {
 		update_option( 'blogname', 'Estatein' );
 	}
-	if ( in_array( get_option( 'blogdescription' ), array( '', 'Just another WordPress site' ), true ) ) {
+	// Includes the default taglines set by WordPress and by Softaculous installers.
+	if ( in_array( get_option( 'blogdescription' ), array( '', 'Just another WordPress site', 'My WordPress Blog', 'My WordPress Website' ), true ) ) {
 		update_option( 'blogdescription', __( 'Find, buy, sell and manage property with Estatein.', 'estatein' ) );
 	}
 
