@@ -1,14 +1,19 @@
 <?php
 /**
- * Property card. Used in the home carousel, the archive grid and related listings.
+ * Property card. Used in the home carousel and the archive grid.
  * Must be called inside The Loop.
+ *
+ * Variants (as in Figma): "featured" (home) shows bed/bath/type chips,
+ * "listing" (Properties page) shows the category tagline instead.
  *
  * @package Estatein
  */
 
 defined( 'ABSPATH' ) || exit;
 
+$estatein_variant   = isset( $args['variant'] ) ? $args['variant'] : 'featured';
 $estatein_id        = get_the_ID();
+$estatein_tagline   = 'listing' === $estatein_variant ? estatein_field( 'tagline', '', $estatein_id ) : '';
 $estatein_beds      = estatein_field( 'bedrooms', '', $estatein_id );
 $estatein_baths     = estatein_field( 'bathrooms', '', $estatein_id );
 $estatein_type      = estatein_field( 'property_type', '', $estatein_id );
@@ -26,6 +31,9 @@ $estatein_title_id  = 'property-' . $estatein_id . '-title';
 	</a>
 
 	<div class="property-card__body">
+		<?php if ( $estatein_tagline ) : ?>
+			<p class="chip chip--tagline"><?php echo esc_html( $estatein_tagline ); ?></p>
+		<?php endif; ?>
 		<h3 class="property-card__title" id="<?php echo esc_attr( $estatein_title_id ); ?>">
 			<a href="<?php echo esc_url( $estatein_permalink ); ?>"><?php the_title(); ?></a>
 		</h3>
@@ -34,6 +42,7 @@ $estatein_title_id  = 'property-' . $estatein_id . '-title';
 			<a class="text-link" href="<?php echo esc_url( $estatein_permalink ); ?>"><?php esc_html_e( 'Read More', 'estatein' ); ?><span class="visually-hidden"> <?php esc_html_e( 'about', 'estatein' ); ?> <?php the_title(); ?></span></a>
 		</p>
 
+		<?php if ( 'featured' === $estatein_variant ) : ?>
 		<ul class="chips" aria-label="<?php esc_attr_e( 'Key features', 'estatein' ); ?>">
 			<?php if ( '' !== $estatein_beds ) : ?>
 				<?php /* translators: %s: number of bedrooms. */ ?>
@@ -47,6 +56,7 @@ $estatein_title_id  = 'property-' . $estatein_id . '-title';
 				<li class="chip"><?php estatein_the_icon( 'building' ); ?><?php echo esc_html( $estatein_type ); ?></li>
 			<?php endif; ?>
 		</ul>
+		<?php endif; ?>
 
 		<div class="property-card__footer">
 			<?php if ( '' !== $estatein_price ) : ?>

@@ -57,7 +57,8 @@ defined( 'ABSPATH' ) || exit;
 					)
 				);
 				?>
-				<a class="btn btn--dark nav__cta" href="<?php echo esc_url( estatein_mod( 'contact_url' ) ); ?>"><?php echo esc_html( estatein_mod( 'contact_label' ) ); ?></a>
+				<?php $estatein_on_contact = is_page_template( 'page-contact.php' ); ?>
+				<a class="btn <?php echo $estatein_on_contact ? 'btn--primary' : 'btn--dark'; ?> nav__cta" href="<?php echo esc_url( estatein_mod( 'contact_url' ) ); ?>"<?php echo $estatein_on_contact ? ' aria-current="page"' : ''; ?>><?php echo esc_html( estatein_mod( 'contact_label' ) ); ?></a>
 			</nav>
 		</div>
 	</div>

@@ -27,7 +27,20 @@ function estatein_seo_plugin_active() {
 function estatein_meta_description() {
 	if ( is_singular() ) {
 		$post = get_queried_object();
-		$text = has_excerpt( $post ) ? get_the_excerpt( $post ) : wp_strip_all_tags( strip_shortcodes( $post->post_content ) );
+		// Space after block-level closing tags so paragraphs do not run together.
+		$text = has_excerpt( $post ) ? get_the_excerpt( $post ) : wp_strip_all_tags( preg_replace( '#</(p|h[1-6]|li)>#i', '$0 ', strip_shortcodes( $post->post_content ) ) );
+
+		// Designed templates keep their copy in section fields, not in the editor.
+		$intros = array(
+			'page-about.php'    => 'journey',
+			'page-services.php' => 'intro',
+			'page-contact.php'  => 'intro',
+		);
+		$template = get_page_template_slug( $post );
+		if ( '' === trim( $text ) && isset( $intros[ $template ] ) ) {
+			$section = estatein_section( $intros[ $template ], $post->ID, $template );
+			$text    = isset( $section['text'] ) ? $section['text'] : '';
+		}
 	} elseif ( is_post_type_archive( 'property' ) ) {
 		$text = __( 'Browse homes, apartments and investment properties for sale with Estatein.', 'estatein' );
 	} else {
@@ -36,6 +49,10 @@ function estatein_meta_description() {
 
 	if ( is_front_page() ) {
 		$text = estatein_field( 'hero.text', __( 'Your journey to finding the perfect property begins here. Explore our listings to find the home that matches your dreams.', 'estatein' ), get_option( 'page_on_front' ) );
+	}
+
+	if ( '' === trim( (string) $text ) ) {
+		$text = get_bloginfo( 'description' );
 	}
 
 	return wp_trim_words( (string) $text, 28, '…' );
@@ -67,6 +84,14 @@ function estatein_print_meta_tags() {
 
 	if ( $image ) {
 		printf( '<meta property="og:image" content="%s">' . "\n", esc_url( $image ) );
+	}
+
+	// Core prints canonicals for singular views only. Filtered listings point
+	// to the unfiltered page so search engines index one URL per page.
+	if ( is_post_type_archive( 'property' ) ) {
+		$paged = max( 1, (int) get_query_var( 'paged' ) );
+		$link  = get_post_type_archive_link( 'property' );
+		printf( '<link rel="canonical" href="%s">' . "\n", esc_url( $paged > 1 ? trailingslashit( $link ) . user_trailingslashit( 'page/' . $paged, 'paged' ) : $link ) );
 	}
 }
 add_action( 'wp_head', 'estatein_print_meta_tags', 1 );

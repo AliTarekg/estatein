@@ -33,12 +33,6 @@ $estatein_image = $estatein_image_id
 	? estatein_image( $estatein_image_id, 'estatein-hero', $estatein_image_attrs )
 	: estatein_image( 'hero-building.webp', 'full', $estatein_image_attrs + array( 'width' => 1000, 'height' => 814 ) );
 
-$estatein_features = array(
-	1 => array( __( 'Find Your Dream Home', 'estatein' ), 'feature-home', get_post_type_archive_link( 'property' ) ),
-	2 => array( __( 'Unlock Property Value', 'estatein' ), 'feature-value', home_url( '/services/#valuation' ) ),
-	3 => array( __( 'Effortless Property Management', 'estatein' ), 'feature-management', home_url( '/services/#management' ) ),
-	4 => array( __( 'Smart Investments, Informed Decisions', 'estatein' ), 'feature-investment', home_url( '/services/#investments' ) ),
-);
 ?>
 <section class="hero" id="hero" aria-labelledby="hero-title">
 	<div class="hero__grid">
@@ -61,14 +55,16 @@ $estatein_features = array(
 				<a class="btn btn--primary btn--lg" <?php estatein_link_attrs( $estatein_primary ); ?>><?php echo esc_html( $estatein_primary['title'] ); ?></a>
 			</div>
 
-			<dl class="stats">
-				<?php foreach ( $estatein_stats as $estatein_n => $estatein_stat ) : ?>
-					<div class="stat">
-						<dt class="stat__label"><?php echo esc_html( estatein_field( 'hero.stat_' . $estatein_n . '_label', $estatein_stat[1], $estatein_front ) ); ?></dt>
-						<dd class="stat__value" data-count-up><?php echo esc_html( estatein_field( 'hero.stat_' . $estatein_n . '_value', $estatein_stat[0], $estatein_front ) ); ?></dd>
-					</div>
-				<?php endforeach; ?>
-			</dl>
+			<?php
+			$estatein_stat_items = array();
+			foreach ( $estatein_stats as $estatein_n => $estatein_stat ) {
+				$estatein_stat_items[] = array(
+					'value' => estatein_field( 'hero.stat_' . $estatein_n . '_value', $estatein_stat[0], $estatein_front ),
+					'label' => estatein_field( 'hero.stat_' . $estatein_n . '_label', $estatein_stat[1], $estatein_front ),
+				);
+			}
+			get_template_part( 'template-parts/components/stats', null, array( 'items' => $estatein_stat_items ) );
+			?>
 		</div>
 
 		<div class="hero__media">
@@ -78,24 +74,4 @@ $estatein_features = array(
 	</div>
 </section>
 
-<section class="features" id="features" aria-label="<?php esc_attr_e( 'What we offer', 'estatein' ); ?>">
-	<ul class="features__list">
-		<?php foreach ( $estatein_features as $estatein_n => $estatein_feature ) : ?>
-			<?php
-			$estatein_feature_link = estatein_link(
-				estatein_field( 'features.feature_' . $estatein_n . '.link', array(), $estatein_front ),
-				'',
-				$estatein_feature[2]
-			);
-			$estatein_feature_title = estatein_field( 'features.feature_' . $estatein_n . '.title', $estatein_feature[0], $estatein_front );
-			?>
-			<li class="feature">
-				<a class="feature__link" <?php estatein_link_attrs( $estatein_feature_link ); ?>>
-					<span class="icon-ring"><span class="icon-ring__inner"><?php estatein_the_icon( $estatein_feature[1] ); ?></span></span>
-					<span class="feature__title"><?php echo esc_html( $estatein_feature_title ); ?></span>
-					<?php estatein_the_icon( 'arrow-up-right', 'feature__arrow' ); ?>
-				</a>
-			</li>
-		<?php endforeach; ?>
-	</ul>
-</section>
+<?php get_template_part( 'template-parts/components/features', null, array( 'items' => estatein_feature_items() ) ); ?>
