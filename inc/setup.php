@@ -90,3 +90,47 @@ function estatein_menu_link_attributes( $atts, $item, $args ) {
 	return $atts;
 }
 add_filter( 'nav_menu_link_attributes', 'estatein_menu_link_attributes', 10, 3 );
+
+/**
+ * Keep "Properties" highlighted on single property pages (custom menu links
+ * only match their own URL, not child pages).
+ *
+ * @param string[] $classes Menu item classes.
+ * @param WP_Post  $item    Menu item.
+ * @return string[]
+ */
+function estatein_menu_item_classes( $classes, $item ) {
+	if ( estatein_is_property_section_item( $item ) ) {
+		$classes[] = 'current-menu-item';
+	}
+
+	return $classes;
+}
+add_filter( 'nav_menu_css_class', 'estatein_menu_item_classes', 10, 2 );
+
+/**
+ * Matching aria-current for that link (core only sets it on exact matches).
+ *
+ * @param array   $atts Link attributes.
+ * @param WP_Post $item Menu item.
+ * @return array
+ */
+function estatein_menu_aria_current( $atts, $item ) {
+	if ( estatein_is_property_section_item( $item ) ) {
+		$atts['aria-current'] = 'page';
+	}
+	return $atts;
+}
+add_filter( 'nav_menu_link_attributes', 'estatein_menu_aria_current', 20, 2 );
+
+/**
+ * Whether a menu item is the Properties archive link while viewing a property.
+ *
+ * @param WP_Post $item Menu item.
+ * @return bool
+ */
+function estatein_is_property_section_item( $item ) {
+	$archive = get_post_type_archive_link( 'property' );
+
+	return $archive && is_singular( 'property' ) && untrailingslashit( $item->url ) === untrailingslashit( $archive );
+}

@@ -57,24 +57,60 @@ function estatein_register_acf_fields() {
 				estatein_acf( 'property', 'price', __( 'Price (USD)', 'estatein' ), 'number', array( 'min' => 0, 'prepend' => '$' ) ),
 				estatein_acf( 'property', 'bedrooms', __( 'Bedrooms', 'estatein' ), 'number', array( 'min' => 0 ) ),
 				estatein_acf( 'property', 'bathrooms', __( 'Bathrooms', 'estatein' ), 'number', array( 'min' => 0, 'step' => 0.5 ) ),
+				estatein_acf( 'property', 'area', __( 'Area (sq ft)', 'estatein' ), 'number', array( 'min' => 0 ) ),
+				estatein_acf( 'property', 'year_built', __( 'Year built', 'estatein' ), 'number', array( 'min' => 1800, 'max' => 2100 ) ),
 				estatein_acf(
 					'property',
 					'property_type',
 					__( 'Property type', 'estatein' ),
 					'select',
 					array(
-						'choices'       => array(
-							'Villa'     => 'Villa',
-							'Apartment' => 'Apartment',
-							'Townhouse' => 'Townhouse',
-							'Cottage'   => 'Cottage',
-							'Penthouse' => 'Penthouse',
-						),
+						'choices'       => array_combine( estatein_property_types(), estatein_property_types() ),
 						'default_value' => 'Villa',
 					)
 				),
-				estatein_acf( 'property', 'location', __( 'Location', 'estatein' ) ),
+				estatein_acf( 'property', 'location', __( 'Location', 'estatein' ), 'text', array( 'placeholder' => 'Malibu, California' ) ),
+				estatein_acf( 'property', 'tagline', __( 'Category tagline', 'estatein' ), 'text', array( 'placeholder' => 'Coastal Escapes - Where Waves Beckon' ) ),
 				estatein_acf( 'property', 'featured', __( 'Show in "Featured Properties"', 'estatein' ), 'true_false', array( 'ui' => 1, 'default_value' => 1 ) ),
+			),
+		)
+	);
+
+	/*
+	 * Features list and pricing breakdown, shown on the property page.
+	 * Empty pricing fields fall back to estimates based on the price.
+	 */
+	acf_add_local_field_group(
+		array(
+			'key'      => 'group_estatein_property_more',
+			'title'    => __( 'Features & Pricing', 'estatein' ),
+			'location' => array( array( array( 'param' => 'post_type', 'operator' => '==', 'value' => 'property' ) ) ),
+			'fields'   => array(
+				estatein_acf( 'property', 'features', __( 'Key features and amenities', 'estatein' ), 'textarea', array( 'rows' => 6, 'instructions' => __( 'One feature per line.', 'estatein' ) ) ),
+				estatein_acf( 'property', 'pricing_transfer_tax', __( 'Property transfer tax ($)', 'estatein' ), 'number', array( 'min' => 0, 'wrapper' => array( 'width' => 33 ) ) ),
+				estatein_acf( 'property', 'pricing_legal_fees', __( 'Legal fees ($)', 'estatein' ), 'number', array( 'min' => 0, 'wrapper' => array( 'width' => 33 ) ) ),
+				estatein_acf( 'property', 'pricing_inspection', __( 'Home inspection ($)', 'estatein' ), 'number', array( 'min' => 0, 'wrapper' => array( 'width' => 33 ) ) ),
+				estatein_acf( 'property', 'pricing_insurance', __( 'Property insurance, annual ($)', 'estatein' ), 'number', array( 'min' => 0, 'wrapper' => array( 'width' => 33 ) ) ),
+				estatein_acf( 'property', 'pricing_property_tax', __( 'Property taxes, monthly ($)', 'estatein' ), 'number', array( 'min' => 0, 'wrapper' => array( 'width' => 33 ) ) ),
+				estatein_acf( 'property', 'pricing_hoa', __( 'HOA fee, monthly ($)', 'estatein' ), 'number', array( 'min' => 0, 'wrapper' => array( 'width' => 33 ) ) ),
+				estatein_acf( 'property', 'pricing_down_payment', __( 'Down payment (%)', 'estatein' ), 'number', array( 'min' => 0, 'max' => 100, 'placeholder' => 20, 'wrapper' => array( 'width' => 33 ) ) ),
+			),
+		)
+	);
+
+	/*
+	 * Team member. Title = name, featured image = photo.
+	 */
+	acf_add_local_field_group(
+		array(
+			'key'      => 'group_estatein_team',
+			'title'    => __( 'Team Member', 'estatein' ),
+			'position' => 'side',
+			'location' => array( array( array( 'param' => 'post_type', 'operator' => '==', 'value' => 'team_member' ) ) ),
+			'fields'   => array(
+				estatein_acf( 'team', 'role', __( 'Role', 'estatein' ) ),
+				estatein_acf( 'team', 'email', __( 'Email (for "Say Hello")', 'estatein' ), 'email' ),
+				estatein_acf( 'team', 'twitter_url', __( 'X / Twitter URL', 'estatein' ), 'url', array( 'instructions' => __( 'Empty: links to the company account set in the Customizer.', 'estatein' ) ) ),
 			),
 		)
 	);

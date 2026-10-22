@@ -196,6 +196,49 @@ function estatein_pad( $number ) {
 }
 
 /**
+ * The four feature cards shown under the home hero and on the Services page.
+ * Titles and links are edited once, on the Home page (ACF "Features" tab).
+ *
+ * @return array[] Items with icon, title and url.
+ */
+function estatein_feature_items() {
+	$front    = (int) get_option( 'page_on_front' );
+	$services = home_url( '/services/' );
+	$defaults = array(
+		1 => array( __( 'Find Your Dream Home', 'estatein' ), 'feature-home', get_post_type_archive_link( 'property' ) ),
+		2 => array( __( 'Unlock Property Value', 'estatein' ), 'feature-value', $services . '#valuation' ),
+		3 => array( __( 'Effortless Property Management', 'estatein' ), 'feature-management', $services . '#management' ),
+		4 => array( __( 'Smart Investments, Informed Decisions', 'estatein' ), 'feature-investment', $services . '#investments' ),
+	);
+
+	$items = array();
+	foreach ( $defaults as $n => $default ) {
+		$link    = estatein_link( $front ? estatein_field( 'features.feature_' . $n . '.link', array(), $front ) : array(), '', $default[2] );
+		$items[] = array(
+			'icon'  => $default[1],
+			'title' => $front ? estatein_field( 'features.feature_' . $n . '.title', $default[0], $front ) : $default[0],
+			'url'   => $link['url'],
+		);
+	}
+
+	return $items;
+}
+
+/**
+ * Format a whole number with an optional unit: 2500 -> "2,500 Square Feet".
+ *
+ * @param mixed  $number Number.
+ * @param string $unit   Unit label.
+ * @return string
+ */
+function estatein_format_number( $number, $unit = '' ) {
+	if ( ! is_numeric( $number ) ) {
+		return (string) $number;
+	}
+	return trim( number_format_i18n( (float) $number ) . ' ' . $unit );
+}
+
+/**
  * Render the shared section heading (sparkle mark, title, intro, CTA button).
  *
  * @param array $args {

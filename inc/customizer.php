@@ -29,10 +29,15 @@ function estatein_mod_defaults() {
 		'cta_url'        => '/properties/',
 		'copyright'      => __( '©2023 Estatein. All Rights Reserved.', 'estatein' ),
 		'terms_url'      => '/terms-and-conditions/',
-		'social_facebook' => '#',
-		'social_linkedin' => '#',
-		'social_twitter'  => '#',
-		'social_youtube'  => '#',
+		'contact_email'  => 'info@estatein.com',
+		'contact_phone'  => '+1 (123) 456-7890',
+		'contact_hq'     => __( 'Main Headquarters', 'estatein' ),
+		'contact_hq_url' => '/contact-us/#offices',
+		'social_facebook'  => '#',
+		'social_linkedin'  => '#',
+		'social_twitter'   => '#',
+		'social_youtube'   => '#',
+		'social_instagram' => '#',
 	);
 }
 
@@ -93,15 +98,25 @@ function estatein_customize_register( $wp_customize ) {
 				'cta_url'   => array( __( 'Button URL', 'estatein' ), 'url' ),
 			),
 		),
+		'estatein_contact' => array(
+			'title'  => __( 'Contact Details', 'estatein' ),
+			'fields' => array(
+				'contact_email'  => array( __( 'Email', 'estatein' ), 'text' ),
+				'contact_phone'  => array( __( 'Phone', 'estatein' ), 'text' ),
+				'contact_hq'     => array( __( 'Headquarters label', 'estatein' ), 'text' ),
+				'contact_hq_url' => array( __( 'Headquarters link', 'estatein' ), 'url' ),
+			),
+		),
 		'estatein_footer' => array(
 			'title'  => __( 'Footer & Social', 'estatein' ),
 			'fields' => array(
-				'copyright'       => array( __( 'Copyright line', 'estatein' ), 'text' ),
-				'terms_url'       => array( __( 'Terms & Conditions URL', 'estatein' ), 'url' ),
-				'social_facebook' => array( __( 'Facebook URL', 'estatein' ), 'url' ),
-				'social_linkedin' => array( __( 'LinkedIn URL', 'estatein' ), 'url' ),
-				'social_twitter'  => array( __( 'X / Twitter URL', 'estatein' ), 'url' ),
-				'social_youtube'  => array( __( 'YouTube URL', 'estatein' ), 'url' ),
+				'copyright'        => array( __( 'Copyright line', 'estatein' ), 'text' ),
+				'terms_url'        => array( __( 'Terms & Conditions URL', 'estatein' ), 'url' ),
+				'social_facebook'  => array( __( 'Facebook URL', 'estatein' ), 'url' ),
+				'social_linkedin'  => array( __( 'LinkedIn URL', 'estatein' ), 'url' ),
+				'social_twitter'   => array( __( 'X / Twitter URL', 'estatein' ), 'url' ),
+				'social_youtube'   => array( __( 'YouTube URL', 'estatein' ), 'url' ),
+				'social_instagram' => array( __( 'Instagram URL (contact page)', 'estatein' ), 'url' ),
 			),
 		),
 	);
