@@ -1,91 +1,105 @@
 # Estatein — Custom WordPress Theme
 
-A custom WordPress theme built from the **Real Estate Business Website UI Template – Dark Theme** Figma file (Produce UI). Dark, fully responsive, editable through custom post types, ACF fields and the Customizer.
+A custom classic WordPress theme built from the Figma community file **Real Estate Business Website UI Template – Dark Theme** (Produce UI). It covers all six designed pages — Home, About Us, Properties, Property Details, Services and Contact — at desktop, laptop, tablet and mobile widths. Content is editable through custom post types, ACF fields and the Customizer, and forms work without plugins.
 
-- **Live demo:** `https://YOUR-SITE.example` ← replace after deploying
-- **Requires:** WordPress 6.4+ (tested on 6.6), PHP 7.4+
-- **Recommended plugin:** [Advanced Custom Fields](https://wordpress.org/plugins/advanced-custom-fields/) (free). The theme still renders without it, using the design's copy as defaults.
+- **Live demo:** not deployed yet — see [Deploying](#deploying).
+- **Requires:** WordPress 6.4+ · PHP 7.4+. Tested on WordPress 7.1.3 / PHP 8.5 (WordPress Playground).
+- **Recommended plugin:** [Advanced Custom Fields](https://wordpress.org/plugins/advanced-custom-fields/) (free). The theme renders fully without it, using the design's copy as defaults; ACF only adds the editing screens.
 
 ## Install
 
-1. Upload the `estatein` folder to `wp-content/themes/` (or zip it and use **Appearance → Themes → Add New → Upload**).
-2. Install and activate **Advanced Custom Fields** (free).
-3. Activate **Estatein**. On first activation the theme creates, once and without overwriting anything:
-   - Pages: Home (set as the front page), About Us, Services, Contact Us (Contact template), Terms & Conditions
-   - 6 sample properties, 6 testimonials, 6 FAQs (copy from the Figma file)
-   - The primary menu and the footer column menu
-   - Pretty permalinks (`/%postname%/`) if none were set
-4. Add images (see below).
+1. Download `estatein.zip` (or build it — see [Development](#development)).
+2. In WordPress: **Appearance → Themes → Add New → Upload Theme**, choose the zip, install, **Activate**.
+3. Install and activate **Advanced Custom Fields** (Plugins → Add New → search "Advanced Custom Fields").
 
-## Images to export from Figma
+On activation the theme creates sample content once, without overwriting anything that already exists:
 
-The Figma asset server cannot be reached from a build script, so images are added by hand. Every image is optional — the layout has designed fallbacks — but add these for full fidelity:
+- Pages with their templates: Home (set as the front page), About Us, Services, Contact Us, Terms & Conditions
+- 6 properties (photos, gallery, details, pricing), 6 testimonials, 6 FAQs, 4 team members — images are imported into the Media Library
+- The primary menu and the footer column menu
+- Pretty permalinks (`/%postname%/`) if none were set
 
-| Where | What to export (Figma layer) | How to add it |
-|---|---|---|
-| Logo | `Header › Navigation Bar › Logo` → SVG | Save as `assets/images/logo.svg`, or upload in **Appearance → Customize → Site Identity** |
-| Home hero building | `Home Page – Desktop › Container › Image` → PNG 2x | Upload in **Pages → Home → Hero image** (ACF). Or save a WebP as `assets/images/hero-building.webp` |
-| Property photos | The 3 card images in *Featured Properties* → PNG/JPG 2x | **Properties → (property) → Featured image** |
-| Client photos | The 3 testimonial avatars → PNG 2x | **Testimonials → (testimonial) → Featured image** |
-| Icons (optional) | Any icon → SVG | Overwrite the file with the same name in `assets/icons/` |
+If a host activates themes without firing WordPress's activation hook, the same content is created on the first visit to the dashboard by an administrator.
 
 ## Editing content
 
 | Content | Where |
 |---|---|
-| Hero text, buttons, stats, image; feature cards; section headings | **Pages → Home** (ACF "Home Page Sections") |
-| Listings (price, beds, baths, type, location, featured flag) | **Properties** |
-| Client reviews (headline, quote, name, location, rating, photo) | **Testimonials** |
+| Home hero, stats, image, feature cards, section headings | **Pages → Home** (ACF "Home Page Sections") |
+| About / Services / Contact copy, cards, offices, gallery | **Pages → About Us / Services / Contact Us** (ACF "… Page Sections"; empty fields show the design copy as placeholder) |
+| Listings: price, beds, baths, area, year built, type, location, tagline, features, pricing | **Properties** (side panel + "Features & Pricing") |
+| Property photo gallery | **Properties → (property) → Property Gallery** box |
+| Client reviews | **Testimonials** |
 | Questions (excerpt = card teaser, content = full answer) | **FAQs** |
-| Announcement banner, header button, closing CTA, copyright, social links | **Appearance → Customize → Estatein** |
-| Header links | **Appearance → Menus → Primary** |
-| Footer columns (top-level items = headings, children = links) | **Appearance → Menus → Footer Columns** |
-| Contact & newsletter submissions | **Inquiries** (also emailed to the admin address) |
+| Team (name, role, photo, email, X link) | **Team** |
+| Banner, header button, contact details, closing CTA, copyright, social links | **Appearance → Customize → Estatein** |
+| Header links / footer columns | **Appearance → Menus** (Primary, Footer Columns — top-level items become headings) |
+| Form submissions | **Inquiries** (also emailed to the admin address) |
 
-Drag-and-drop order uses the **Order** field (Page Attributes) on properties, testimonials and FAQs.
+Order of properties, testimonials, FAQs and team uses the **Order** field (Page Attributes).
 
 ## Structure
 
 ```
 estatein/
-├── style.css                 Theme header only
-├── functions.php             Loads /inc modules
+├── style.css                    Theme header
+├── functions.php                Loads the /inc modules
 ├── inc/
-│   ├── helpers.php           estatein_field(), icons, images, links, formatting
-│   ├── setup.php             Theme supports, menus, image sizes
-│   ├── enqueue.php           Assets (minified in production), resource hints
-│   ├── post-types.php        Property, Testimonial, FAQ + archive query/filter
-│   ├── acf-fields.php        ACF field groups registered in PHP
-│   ├── customizer.php        Site-wide options
-│   ├── forms.php             Contact & newsletter handlers, Inquiries post type
-│   ├── seo.php               Meta description, Open Graph, JSON-LD
-│   └── demo-content.php      One-time seeding on activation
+│   ├── helpers.php              Field reader, icons, images, formatting, feature cards
+│   ├── setup.php                Theme supports, menus, image sizes, menu highlighting
+│   ├── enqueue.php              Assets (minified unless SCRIPT_DEBUG), resource hints
+│   ├── post-types.php           Property, Testimonial, FAQ, Team + archive search/filters
+│   ├── acf-fields.php           ACF field groups for Home, properties, testimonials, team
+│   ├── page-sections.php        About/Services/Contact sections: defaults + generated ACF fields
+│   ├── property-gallery.php     Gallery meta box (core media modal, REST post meta)
+│   ├── property-details.php     Features list and pricing breakdown
+│   ├── customizer.php           Site-wide options
+│   ├── forms.php                All forms: validation, nonce, honeypot, rate limit, Inquiries
+│   ├── seo.php                  Meta description, Open Graph, canonical, JSON-LD
+│   └── demo-content.php         Versioned, non-destructive sample content
 ├── template-parts/
-│   ├── components/           logo, section-heading, cards, carousel-nav, cta, page-hero
-│   └── home/                 hero (+ features), properties, testimonials, faq
-├── front-page.php · page.php · page-contact.php · single.php · index.php · 404.php
-├── archive-property.php · single-property.php · searchform.php
+│   ├── components/              logo, page-hero, section-heading, features, stats, cards, carousel-nav, cta
+│   ├── forms/property-match.php "Let's Make it Happen" request form
+│   └── home/                    hero, properties, testimonials, faq
+├── front-page.php · page-about.php · page-services.php · page-contact.php
+├── archive-property.php · single-property.php · page.php · single.php · index.php · 404.php · searchform.php
 └── assets/
-    ├── css/main.css (+ main.min.css)
-    ├── js/main.js (+ main.min.js)
-    ├── icons/*.svg           Inline SVG icons (inherit currentColor)
-    └── images/               Exported Figma images go here
+    ├── css/main.css (+ .min)    js/main.js (+ .min), js/admin-gallery.js
+    ├── icons/*.svg              Inline SVG icons (Figma), inherit currentColor
+    └── images/                  Figma photos (WebP), logo and line artwork (SVG)
 ```
 
-## Build
-
-The minified files are committed, so no build step is needed to run the theme. After editing CSS or JS:
+## Development
 
 ```bash
-npm install
-npm run build
+npm install          # csso + terser
+npm run build        # main.css → main.min.css, main.js → main.min.js
+npm run package      # build, then dist/estatein.zip from the last commit (git archive)
 ```
 
-Set `define( 'SCRIPT_DEBUG', true );` in `wp-config.php` to load the readable sources instead of the minified files.
+Minified files are committed, so no build is needed to run the theme. Add `define( 'SCRIPT_DEBUG', true );` to `wp-config.php` to load the readable sources.
 
-## Deploying to free hosting (InfinityFree / Wasmer)
+**Local WordPress without installing PHP or MySQL** (Node 20+):
 
-1. Create a WordPress site from the host's installer.
-2. Upload the theme zip under **Appearance → Themes → Add New → Upload**, install ACF, activate the theme.
-3. Upload the images listed above.
-4. Check **Settings → Permalinks** shows "Post name", and save once.
+```bash
+npx @wp-playground/cli@latest server --auto-mount --port=9400
+# then open http://127.0.0.1:9400/wp-admin (admin / password), install ACF, activate Estatein
+```
+
+## Deploying
+
+Any host with PHP 7.4+ and MySQL/MariaDB works (shared hosting, managed WordPress, or a free host such as InfinityFree).
+
+1. Create the WordPress site with the host's installer.
+2. Upload `dist/estatein.zip` (Appearance → Themes → Upload), activate it, install ACF.
+3. Visit the dashboard once as an administrator (this finishes the sample content if the host skipped the activation hook).
+4. Settings → Permalinks: confirm "Post name" and save once.
+5. Appearance → Customize → Estatein: set real social links (they default to `#`) and contact details.
+6. Check that email works (Tools → Site Health), or rely on the Inquiries screen, which stores every submission.
+
+## Known limitations
+
+- Sample clients, offices and team links are demonstration content; client "Visit Website" buttons only appear when a URL is entered.
+- Properties are listed as a paginated grid with filters, instead of the Figma carousel, so that search and filtering stay usable.
+- The form rate limit (5 submissions per form per IP every 10 minutes) uses `REMOTE_ADDR`. Behind a reverse proxy, raise or disable it with the `estatein_form_rate_limit` filter.
+- Post types live in the theme to keep the assessment self-contained; in production they would move to a small site plugin so content survives a theme change.

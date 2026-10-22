@@ -1,62 +1,50 @@
 # Estatein WordPress Theme — Development Notes
 
-**Author:** Ali Tarek · **Theme:** custom classic theme (PHP templates), no page builder · **Design source:** Real Estate Business Website UI Template – Dark Theme (Figma)
+**Author:** Ali Tarek · **Theme:** custom classic theme (PHP templates), no page builder · **Design:** Real Estate Business Website UI Template – Dark Theme (Figma, Produce UI)
 
 ## 1. Process
 
-1. **Read the design first.** I took the Figma variables (colours Grey/08–60, Purple/60–75), typography (Urbanist 500/600/700) and the exact spacing of each Home section from Figma Dev Mode, and mapped the 1920px desktop, 1440px laptop and 390px mobile frames to fluid CSS values.
-2. **Prioritised by the brief's guidance:** a complete, polished Home page (header, hero, feature strip, properties, testimonials, FAQs, CTA, footer) plus working Properties archive, Property detail and Contact pages, rather than every page half-built.
-3. **Modelled content before markup:** decided which content is repeatable (post types), which is page-specific (ACF on the Home page) and which is site-wide (Customizer).
-4. **Built and verified on a real WordPress install,** checking rendered pages at 1920, 1440 and 390px, PHP warnings, form submissions and 404s.
+1. **Read the design first.** Six pages (Home, About, Properties, Property Details, Services, Contact) in three frames each (1920, 1440, 390). I took colours, the Urbanist type scale and spacing from the Figma variables and mapped the frames to fluid `clamp()` values. Photos, the logo, the line artwork and the icons were exported from the file, so nothing is a stand-in.
+2. **Modelled content before markup.** Repeatable things are post types (properties, testimonials, FAQs, team), page-specific copy is ACF fields, and site-wide details are Customizer options.
+3. **Built shared pieces first** — header, footer, section heading, cards, carousels, forms — then the pages, home page first.
+4. **Verified in a real WordPress** (WordPress Playground: WordPress 7.1.3, PHP 8.5): activated the theme from the dashboard with ACF installed, checked each page in Chromium at 375, 390, 768, 1280 and 1440px, ran scripted functional, form, accessibility and PHP-notice checks, and fixed what they found (see §6). The release zip was then installed on a clean WordPress **without** ACF, and every page rendered from the built-in defaults with no PHP notices.
 
-## 2. Theme architecture and choices
+## 2. Theme architecture
 
-- **Custom classic theme.** Templates are plain PHP with reusable template parts (`template-parts/components/*`). Header, footer, section heading, cards, carousel controls and the CTA are each written once and reused.
-- **Modular `functions.php`.** It only loads files in `/inc`, one concern per file (setup, assets, post types, fields, customizer, forms, SEO, demo content).
-- **Content model.**
-  - *Custom post types:* **Property** (public, archive at `/properties/`), **Testimonial**, **FAQ** (non-public, editable in the dashboard), and **Inquiry** (stores form submissions).
-  - *ACF (free version only):* property details (price, beds, baths, type, location, featured), testimonial client details, and a "Home Page Sections" group with hero, stats, feature cards and section headings. Fields are **registered in PHP**, so they are version-controlled and deploy with the theme.
-  - *Customizer:* banner, header button, closing CTA, copyright and social links, because they appear on every page.
-  - *Menus:* primary navigation, and footer columns built from one menu (top-level items become column headings).
-- **Graceful defaults.** Every field is read through `estatein_field()` with the Figma copy as the default, so the site looks right on first activation and does not break if ACF is deactivated.
-- **One-time demo content.** On activation the theme creates the pages, menus and sample listings once, and never overwrites existing content, so reviewers see a complete site immediately.
+- **Classic theme with template parts.** `front-page`, `page-about`, `page-services`, `page-contact`, `archive-property`, `single-property`, plus `page`, `single`, `index` (blog and search) and `404`. Components such as the page hero, section heading, feature strip, stats, property/testimonial/FAQ/team/client cards, carousel controls and CTA are each written once and reused.
+- **Modular `functions.php`.** It only loads `/inc` files, one concern each: setup, assets, post types and filters, fields, page sections, gallery, property details, Customizer, forms, SEO, sample content.
+- **One source for page copy.** `inc/page-sections.php` declares each About/Services/Contact section once. That definition provides the Figma copy as defaults, generates the ACF fields (empty fields show the default as placeholder), and feeds the templates through `estatein_section()`. Fields cannot drift from templates, and pages render fully without ACF.
+- **Property data.** ACF (free) fields for price, beds, baths, area, year built, type, location, tagline and features. The pricing breakdown computes totals from stored inputs, with sensible estimates when fields are empty. The gallery is a small native meta box using the core media modal, saved as REST-registered post meta, because ACF free has no gallery field.
+- **Native queries.** The Properties page filters the main query in `pre_get_posts` (keyword, location, type, price, size, build year), so counts and pagination are standard WordPress.
 
-## 3. Responsiveness, UX and accessibility
+## 3. Content-management experience
 
-- Fluid type and spacing with `clamp()`, tuned to the three Figma frames, plus breakpoints at 1440, 1200, 1024 and 768px. Carousels show 3, 2 or 1 card per view.
-- Semantic landmarks, a skip link, one `h1` per page, `aria-labelledby` on sections, labelled form fields, visible focus styles, `aria-expanded` on the mobile menu and FAQ toggles, and screen-reader text on repeated links ("View Property Details: Seaside Serenity Villa").
-- Carousels are native scroll-snap containers, so touch, trackpad and keyboard (arrow keys) work, and the prev/next buttons and "01 of 06" counter stay in sync.
-- All motion respects `prefers-reduced-motion`.
+Editors use familiar screens. Pages have tabbed ACF sections. Properties have a details side panel, a features and pricing box, and a gallery box. Team, Testimonials and FAQs are simple post lists ordered by Page Attributes. Menus drive the header and footer, and the Customizer holds the banner, contact details, CTA and social links. Sample content, including images in the Media Library, is created once on activation. It never overwrites edits, and is versioned so older installs receive only new items.
 
-## 4. Performance and SEO
+## 4. Responsive, accessibility, SEO, performance, security
 
-- No jQuery and no front-end framework: one small deferred script (4 KB minified) and one stylesheet (25 KB minified). Minified builds load in production; sources load with `SCRIPT_DEBUG`.
-- Icons are inline SVG (no icon font, no extra requests). Images use registered sizes, `srcset`, lazy loading, and the hero image loads eagerly with `fetchpriority="high"`.
-- Only the Urbanist weights in use are loaded, with `display=swap` and preconnect hints. Emoji scripts and block-library CSS are removed where not needed.
-- Meta description, Open Graph tags, and JSON-LD (`RealEstateAgent` on Home, `RealEstateListing` with price on property pages). These switch off automatically if Yoast, Rank Math, SEOPress or AIOSEO is installed.
+- **Responsive:** fluid type and spacing with `clamp()`; breakpoints at 1440, 1200, 1024 and 768px; carousels show 3/2/1 cards; no horizontal overflow at any tested width.
+- **Accessibility:** landmarks, skip link, one `h1` per page, labelled fields with inline errors linked by `aria-describedby`, visible focus styles, `aria-expanded`/`aria-pressed`/`aria-current` where state changes, keyboard-scrollable carousels, and `prefers-reduced-motion` support. An automated axe-core scan (WCAG 2.1 A/AA rules) reports 0 violations on every page.
+- **SEO:** meta description, Open Graph, canonical URLs (filtered listings point to the clean list), and JSON-LD (`RealEstateAgent`, `RealEstateListing` with price). These step aside when Yoast, Rank Math, SEOPress or AIOSEO is active.
+- **Performance:** no jQuery or framework on the front end; one deferred script (5 KB minified, 2 KB gzipped) and one stylesheet (42 KB minified, 9 KB gzipped); inline SVG icons; WebP images (1.2 MB for all design images) with `srcset`, lazy loading, and an eagerly loaded, high-priority hero; only the Urbanist weights in use.
+- **Security:** every form goes through one handler with a nonce, a honeypot, a per-IP rate limit, whitelisted choice values, sanitisation and length limits. Output is escaped everywhere. The gallery save checks a nonce and `edit_post`.
 
-## 5. Forms
+## 5. Tools and plugins
 
-The contact and newsletter forms use WordPress's `admin-post.php` with a nonce, a honeypot, server-side sanitisation and validation, and accessible inline client-side validation. Each submission is **saved as a private Inquiry in the dashboard and emailed to the admin**, so nothing is lost on free hosts where PHP mail is disabled. No form plugin is needed.
+- **Plugins:** Advanced Custom Fields (free), optional at runtime. No form, SEO or page-builder plugin.
+- **Tools:** Figma (MCP export of images, icons and specs), WordPress Playground CLI, Playwright + Chromium (screenshots, functional tests), axe-core, csso and terser.
+- **AI:** Claude was used to speed up implementation, testing and review. I reviewed, ran and adjusted the code; the tests above were run against the real theme.
 
-## 6. Enhancements beyond the design
+## 6. Issues found by testing and fixed
 
-- Rotating "Discover Your Dream Property" badge with a hover state, linking to the listings.
-- Hero stats count up on load.
-- FAQ "Read More" expands the full answer in place, without a page load.
-- Property-type filter on the Properties archive.
-- "Send an Inquiry" on a property pre-fills the contact form with that property's name.
-- Dismissible announcement banner that remembers the choice, without a layout jump on reload.
-- Sections fade in on scroll.
+- Sample content never appeared when a host activated the theme without the activation hook; seeding now also runs once from the dashboard.
+- The "Build Year" filter returned nothing, because `year` is a reserved WordPress query var; the parameter is now `built`.
+- Clicking the terms checkbox right after fixing a field could miss: removing an error message on blur shifted the layout under the pointer. Errors now clear while typing.
+- Gallery edits in the block editor did not save, because changes to a classic meta box don't mark the post as changed; the gallery is now REST post meta updated through the editor store.
 
-## 7. Plugins and tools
+## 7. Limitations and next steps
 
-- **Advanced Custom Fields (free)** — field UI for editors. Optional at runtime.
-- No other plugins.
-- Tools: Figma (variables and Dev Mode specs), PHP lint, headless Chromium screenshots at desktop, laptop and mobile widths, csso and terser for minification. Claude (AI) was used to speed up scaffolding and review; all code was checked, tested on a live WordPress install, and adjusted by me.
-
-## 8. Known limitations and next steps
-
-- About Us and Services use the default page template; their dedicated Figma layouts are the next pages to build.
-- Property pages use one featured image; a gallery (ACF gallery or core gallery block) would match the design's detail page more closely.
-- In a production project, the post types would move to a small site plugin so content survives a theme change.
+- Not yet deployed to a public host; the release zip and steps are ready (README, "Deploying").
+- Properties are a filtered, paginated grid instead of the Figma carousel, which suits search better.
+- Clients, offices and social links are sample content; replace them before launch.
+- In production the post types would move to a small site plugin, so content survives a theme switch.
