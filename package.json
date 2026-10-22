@@ -1,0 +1,15 @@
+{
+  "name": "estatein-theme",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Build scripts for the Estatein WordPress theme.",
+  "scripts": {
+    "build:css": "csso assets/css/main.css -o assets/css/main.min.css",
+    "build:js": "terser assets/js/main.js -c -m -o assets/js/main.min.js",
+    "build": "npm run build:css && npm run build:js"
+  },
+  "devDependencies": {
+    "csso-cli": "^4.0.2",
+    "terser": "^5.36.0"
+  }
+}

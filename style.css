@@ -1,0 +1,19 @@
+/*
+Theme Name:   Estatein
+Theme URI:    https://github.com/your-username/estatein-wp-theme
+Author:       Ali Tarek
+Description:  Custom WordPress theme for Estatein, a real estate business website, built from the "Real Estate Business Website UI Template – Dark Theme" Figma file. Custom post types for properties, testimonials and FAQs, ACF-powered editable sections, and a fully responsive dark UI.
+Version:      1.0.0
+Requires at least: 6.4
+Tested up to: 6.8
+Requires PHP: 7.4
+License:      GNU General Public License v2 or later
+License URI:  https://www.gnu.org/licenses/gpl-2.0.html
+Text Domain:  estatein
+Tags:         dark, custom-menu, featured-images, responsive-layout, accessibility-ready
+*/
+
+/*
+ * All theme styles live in assets/css/main.css (and its minified build,
+ * main.min.css). This file only carries the theme header WordPress needs.
+ */
